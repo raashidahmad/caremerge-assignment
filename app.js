@@ -13,16 +13,15 @@ app.use(function (req, res, next) {
 app.use(express.json());
 //End of middleware
 
-/*
-for initial testing only
-app.get('/', (req, res) => {
-    res.send('Hello from Node');
-})*/
-
 const PORT = process.env.PORT || 3000;
 
 http.createServer((req, res) => {
-    if (req.url === '/') {
+    const queryData = url.parse(req.url, true).query;
+    if (queryData && queryData['address']) {
+        console.log(queryData['address']);
+    }
+
+    if (req.url.includes('/I/want/title')) {
         // Set the content type to HTML
         res.writeHead(200, { 'Content-Type': 'text/html' });
         
