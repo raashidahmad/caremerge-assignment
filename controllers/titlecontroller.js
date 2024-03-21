@@ -3,14 +3,13 @@ var router = express.Router();
 
 router.get('/', async (req, res) => {
     try {
-        let obj = {
-            "name": "test"
-        };
-        res.json(obj);
+        console.log('Request executed');
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        // Write your HTML directly as the response
+        res.end("<div><p>Hello HTML</p></div>");
     } catch (err) {
-        res.statusCode = 400;
-        res.statusMessage = 'Something went wrong';
+        res.writeHead(404);
+        res.end();
     }
 });
-
 module.exports = router;

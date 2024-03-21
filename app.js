@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
 const url = require('url');
+const http = require('http');
+const templateHelper = require('./helpers/template')
 
 //The middleware
 app.use(function (req, res, next) {
@@ -19,8 +21,26 @@ app.get('/', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-app.use('/', require('./controllers/titlecontroller'));
+http.createServer((req, res) => {
+    if (req.url === '/') {
+        // Set the content type to HTML
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        
+        let template = templateHelper.getPageTemplate();
+        res.end(template);
+    } else {
+        // Handle other routes or 404
+        res.writeHead(404);
+        res.end();
+    }
 
-app.listen(PORT, () => {
+    //app.use('/', require('./controllers/titlecontroller'));
+}).listen(PORT, () => {
     console.log(`Server started using the port ${PORT}`);
 });
+
+
+
+/*app.listen(PORT, () => {
+    console.log(`Server started using the port ${PORT}`);
+});*/
