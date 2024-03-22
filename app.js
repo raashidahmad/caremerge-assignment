@@ -16,23 +16,22 @@ app.use(express.json());
 const PORT = process.env.PORT || 3000;
 
 http.createServer((req, res) => {
+    
     const queryData = url.parse(req.url, true).query;
+    let formattedDomainsList = '';
     if (queryData && queryData['address']) {
-        console.log(queryData['address']);
+        //console.log(queryData['address']);
+        formattedDomainsList = templateHelper.formatDomainList(queryData['address']);
     }
 
     if (req.url.includes('/I/want/title')) {
-        // Set the content type to HTML
         res.writeHead(200, { 'Content-Type': 'text/html' });
-        
-        let template = templateHelper.getPageTemplate();
+        let template = templateHelper.getPageTemplate(formattedDomainsList);
         res.end(template);
     } else {
-        // Handle other routes or 404
-        res.writeHead(404);
+        res.writeHead(404, `Not Found`);
         res.end();
     }
-
     //app.use('/', require('./controllers/titlecontroller'));
 }).listen(PORT, () => {
     console.log(`Server started using the port ${PORT}`);
