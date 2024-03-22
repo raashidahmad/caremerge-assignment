@@ -27,29 +27,38 @@ http.createServer((req, res) => {
             res.writeHead(200, { 'Content-Type': 'text/html' });
 
             //simple call using a call back
-            /*templateHelper.getPageTemplate(domains, async(template, err) => {
-                if (err === null) {
+            /*templateHelper.getPageTemplate(domains, async(template, error) => {
+                if (error === null) {
                     res.end(template);
                 } else {
-                    res.writeHead(500, `Internal Server Error ${err && err.message || null}`);
+                    res.writeHead(500, `Internal Server Error ${error || && error && error.message || null}`);
                     res.end();
                 }
             });*/
 
             //Call using async lib
-            async.series([next => templateHelper.getPageTemplateUsingAsyncLib(domains, (template, err) => {
-                if (err === null) {
+            /*async.series([next => templateHelper.getPageTemplate(domains, (template, error) => {
+                if (error === null) {
                     res.end(template);
                 } else {
-                    res.writeHead(500, `Internal Server Error ${err && err.message || null}`);
+                    res.writeHead(500, `Internal Server Error ${error || && error && error.message || null}`);
                     res.end();
                 }
             })], (error, results) => {
                 if (error) {
-                    res.writeHead(500, `Internal Server Error ${error && error.message || null}`);
+                    res.writeHead(500, `Internal Server Error ${error || error && error.message || null}`);
                     res.end();
                 }
-            });
+            });*/
+
+            //Call to get a promise result
+            templateHelper.getPageTemplateUsingPromise(domains)
+                .then((template) => {
+                    res.end(template);
+                }).catch((error) => {
+                    res.writeHead(500, `Internal Server Error ${error || error && error.message || null}`);
+                    res.end();
+                })
         } else {
             res.writeHead(404, `Not Found`);
             res.end();
