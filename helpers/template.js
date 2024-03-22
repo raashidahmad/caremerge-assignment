@@ -34,4 +34,40 @@ function getPageTemplate(domains, callback) {
     } 
 }
 
-module.exports = {getPageTemplate, formatDomainList};
+function getPageTemplateUsingAsyncLib(domains, callback) {
+    try {
+        let domainStr = '';
+        if (typeof(domains) === 'string') {
+            if (!validations.validateDomainName(domains)) {
+                domainStr = `<li>${domains} - NO RESPONSE</li>`;
+            } else {
+                domainStr = `<li>${domains}</li>`;
+            }
+        } else if (Array.isArray(domains)) {
+            for(let i = 0; i < domains.length; i++) {
+                domainStr += !validations.validateDomainName(domains[i]) ? `<li>${domains[i]} - NO RESPONSE</li>` : `<li>${domains[i]}</li>`;
+            }
+        }
+        
+        let template = `
+                    <html>
+                    <head></head>
+                    <body>
+                    <h1> Following are the titles of given websites: </h1>
+                    <ul>` 
+                    +
+                    domainStr
+                    +
+                    `</ul>
+                    </body>
+                    </html>
+                    `;
+
+        //console.log(`In the async ${domainStr}`);
+        callback(template, null);
+    } catch(e) {
+        callback('', e);
+    } 
+}
+
+module.exports = {getPageTemplate, getPageTemplateUsingAsyncLib};

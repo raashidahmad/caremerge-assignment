@@ -3,6 +3,7 @@ const app = express();
 const url = require('url');
 const http = require('http');
 const templateHelper = require('./helpers/template');
+const async = require('async');
 
 //The middleware
 app.use(function (req, res, next) {
@@ -24,11 +25,28 @@ http.createServer((req, res) => {
 
         if (req.url.includes('/I/want/title')) {
             res.writeHead(200, { 'Content-Type': 'text/html' });
-            templateHelper.getPageTemplate(domains, (template, err) => {
+
+            //simple call using a call back
+            /*templateHelper.getPageTemplate(domains, async(template, err) => {
                 if (err === null) {
                     res.end(template);
                 } else {
                     res.writeHead(500, `Internal Server Error ${err && err.message || null}`);
+                    res.end();
+                }
+            });*/
+
+            //Call using async lib
+            async.series([next => templateHelper.getPageTemplateUsingAsyncLib(domains, (template, err) => {
+                if (err === null) {
+                    res.end(template);
+                } else {
+                    res.writeHead(500, `Internal Server Error ${err && err.message || null}`);
+                    res.end();
+                }
+            })], (error, results) => {
+                if (error) {
+                    res.writeHead(500, `Internal Server Error ${error && error.message || null}`);
                     res.end();
                 }
             });
