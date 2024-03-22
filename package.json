@@ -8,6 +8,7 @@
     "dev": "nodemon app.js"
   },
   "dependencies": {
+    "async": "^3.2.5",
     "express": "^4.19.1"
   },
   "devDependencies": {
