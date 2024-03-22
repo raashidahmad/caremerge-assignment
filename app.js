@@ -31,7 +31,7 @@ http.createServer((req, res) => {
                 if (error === null) {
                     res.end(template);
                 } else {
-                    res.writeHead(500, `Internal Server Error ${error || && error && error.message || null}`);
+                    res.writeHead(500, `Internal Server Error ${error && error.message || null}`);
                     res.end();
                 }
             });*/
@@ -41,24 +41,36 @@ http.createServer((req, res) => {
                 if (error === null) {
                     res.end(template);
                 } else {
-                    res.writeHead(500, `Internal Server Error ${error || && error && error.message || null}`);
+                    res.writeHead(500, `Internal Server Error ${error && error.message || null}`);
                     res.end();
                 }
             })], (error, results) => {
                 if (error) {
-                    res.writeHead(500, `Internal Server Error ${error || error && error.message || null}`);
+                    res.writeHead(500, `Internal Server Error ${error && error.message || null}`);
                     res.end();
                 }
             });*/
 
             //Call to get a promise result
-            templateHelper.getPageTemplateUsingPromise(domains)
+            /*templateHelper.getPageTemplateUsingPromise(domains)
                 .then((template) => {
                     res.end(template);
                 }).catch((error) => {
-                    res.writeHead(500, `Internal Server Error ${error || error && error.message || null}`);
+                    res.writeHead(500, `Internal Server Error ${error && error.message || null}`);
                     res.end();
-                })
+                });*/
+
+            
+            //Call to the template using RxJs Observables
+            templateHelper.getPageTemplateUsingRxJs(domains, (template, error) => {
+                if (error === null) {
+                    res.end(template);
+                } else {
+                    res.writeHead(500, `Internal Server Error ${error && error.message || null}`);
+                    res.end();
+                }
+            });
+            
         } else {
             res.writeHead(404, `Not Found`);
             res.end();

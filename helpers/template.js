@@ -1,4 +1,5 @@
 let validations = require('./validators');
+const { from } = require('rxjs');
 
 function getPageTemplate(domains, callback) {
     try {
@@ -21,6 +22,20 @@ function getPageTemplateUsingPromise(domains) {
       } else {
         reject(new Error('Failed to create the template')); 
       }
+    });
+}
+
+function getPageTemplateUsingRxJs(domains, callback) {
+    let template = createTemplate(domains);
+    let observable = from([template]);
+
+    observable.subscribe({
+        next: data => {
+            callback(data, null);
+        },
+        error: error => {
+            callback('', error);
+        }
     });
 }
 
@@ -49,4 +64,4 @@ function createTemplate(domains) {
             </html>`;
 }
 
-module.exports = { getPageTemplate, getPageTemplateUsingPromise };
+module.exports = { getPageTemplate, getPageTemplateUsingPromise, getPageTemplateUsingRxJs };
