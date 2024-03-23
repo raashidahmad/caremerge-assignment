@@ -5,7 +5,11 @@ const http = require('http');
 const templateHelper = require('./helpers/template');
 const async = require('async');
 const implementations = require('./helpers/constants');
-//Optional for approach two
+
+/* 
+Optional for approach two
+Left it uncommented, just in case if there is an intention to test approach number two
+*/
 const titlecontroller = require('./controllers/titlecontroller');
 
 //The middleware
@@ -25,7 +29,7 @@ const PORT = process.env.PORT || 3000;
 First the basic approach using the app as a main file only
 Started my learning with this approach
 */
-/*http.createServer((req, res) => {
+http.createServer((req, res) => {
     try {
         const queryData = url.parse(req.url, true).query;
         const pathname = url.parse(req.url, true).pathname;
@@ -82,7 +86,7 @@ Started my learning with this approach
                     break;
 
                 case implementationTypes.PROMISES:
-                    //Call to get a promise result
+                    //async call to get the result using a promise
                     templateHelper.getPageTemplateUsingPromise(domains)
                     .then((template) => {
                         res.end(template);
@@ -119,7 +123,7 @@ Started my learning with this approach
     }
 }).listen(PORT, () => {
     console.log(`Server started using the port ${PORT}`);
-});*/
+});
 
 /*
 End of the first and basic approach.
@@ -127,15 +131,15 @@ End of the first and basic approach.
 
 /*
 This is second approach with a different project structure
-Please comment the first approach to test this second approach
+Please comment the first approach, and uncomment this section to test the second approach
 The motivation for this approach is how to route the request to 
 different controllers as it is in MVC and render the views using
 the html files
 */
 
-app.get('/I/want/title/', titlecontroller.getTitles);
+/*app.get('/I/want/title/', titlecontroller.getTitles);
 app.set('view engine', 'ejs');
 app.listen(PORT, () => {
     console.log(`Server started using the port ${PORT}`);
-});
+});*/
 
