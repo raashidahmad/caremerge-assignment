@@ -42,10 +42,14 @@ function getPageTemplateUsingRxJs(domains, callback) {
 function createTemplate(domains) {
     let domainStr = '';
     if (typeof (domains) === 'string') {
-        if (!validations.validateDomainName(domains)) {
-            domainStr = `<li>${domains} - NO RESPONSE</li>`;
+        if (domains.length === 0) {
+            domainStr = `<li>No domain name/s provided - NO RESPONSE</li>`;
         } else {
-            domainStr = `<li>${domains}</li>`;
+            if (!validations.validateDomainName(domains)) {
+                domainStr = `<li>${domains} - NO RESPONSE</li>`;
+            } else {
+                domainStr = `<li>${domains}</li>`;
+            }
         }
     } else if (Array.isArray(domains)) {
         for (let i = 0; i < domains.length; i++) {
