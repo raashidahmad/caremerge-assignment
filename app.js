@@ -21,6 +21,10 @@ app.use(function (req, res, next) {
 
 const PORT = process.env.PORT || 3000;
 
+/*
+First the basic approach using the app as a main file only
+Started my learning with this approach
+*/
 /*http.createServer((req, res) => {
     try {
         const queryData = url.parse(req.url, true).query;
@@ -118,7 +122,15 @@ const PORT = process.env.PORT || 3000;
 });*/
 
 /*
+End of the first and basic approach.
+*/
+
+/*
 This is second approach with a different project structure
+Please comment the first approach to test this second approach
+The motivation for this approach is how to route the request to 
+different controllers as it is in MVC and render the views using
+the html files
 */
 
 app.get('/I/want/title/', titlecontroller.getTitles);

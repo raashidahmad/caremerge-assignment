@@ -68,11 +68,15 @@ function createTemplate(domains) {
             </html>`;
 }
 
-function parseDomainsForView(domains) {
+function parseDomainsForView(domains, callback) {
     let domainsList = [];
     if (typeof (domains) === 'string') {
         if (domains.length === 0) {
             domainsList.push("No domain name/s provided - NO RESPONSE");
+            const error = {
+                message: 'Invalid domain name provided'
+            }
+            callback(domainsList, error);
         } else {
             if (!validations.validateDomainName(domains)) {
                 domainsList.push(`${domains} - NO RESPONSE`);
@@ -80,6 +84,7 @@ function parseDomainsForView(domains) {
                 domainsList.push(domains);
             }
         }
+        callback(domainsList, null);
     } else if (Array.isArray(domains)) {
         for (let i = 0; i < domains.length; i++) {
              if (!validations.validateDomainName(domains[i])) {
@@ -88,8 +93,8 @@ function parseDomainsForView(domains) {
                 domainsList.push(domains[i]);
              }
         }
-    }
-    return domainsList;
+        callback(domainsList, null);
+    } 
 }
 
 module.exports = { getPageTemplate, getPageTemplateUsingPromise, getPageTemplateUsingRxJs, parseDomainsForView };
