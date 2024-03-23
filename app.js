@@ -5,6 +5,8 @@ const http = require('http');
 const templateHelper = require('./helpers/template');
 const async = require('async');
 const implementations = require('./helpers/constants');
+//Optional for approach two
+const titlecontroller = require('./controllers/titlecontroller');
 
 //The middleware
 /*
@@ -19,7 +21,7 @@ app.use(function (req, res, next) {
 
 const PORT = process.env.PORT || 3000;
 
-http.createServer((req, res) => {
+/*http.createServer((req, res) => {
     try {
         const queryData = url.parse(req.url, true).query;
         const pathname = url.parse(req.url, true).pathname;
@@ -33,9 +35,8 @@ http.createServer((req, res) => {
             res.writeHead(200, { 'Content-Type': 'text/html' });
 
             const implementationTypes = implementations.asyncImplementations;
-            /*
-            Please comment, and uncomment to see the each implementation
-            */
+
+            //Please comment, and uncomment to see the each implementation
             let currentType = implementationTypes.RXJS;
             //let currentType = implementationTypes.PROMISES;
             //let currentType = implementationTypes.ASYNC_LIB;
@@ -57,11 +58,10 @@ http.createServer((req, res) => {
 
                 case implementationTypes.ASYNC_LIB:
                     //Call using async lib
-                    /*
-                    I could add multiple function here in the series to be executed in the sequence
-                    For example, the first function will parse the domains, and second will return the
-                    template. Avoided that only to keep one template helper for all the implementations
-                    */
+                    //I could add multiple function here in the series to be executed in the sequence
+                    //For example, the first function will parse the domains, and second will return the
+                    //template. Avoided that only to keep one template helper for all the implementations
+                    //
                     async.series([next => templateHelper.getPageTemplate(domains, (template, error) => {
                         if (error === null) {
                             res.end(template);
@@ -90,11 +90,10 @@ http.createServer((req, res) => {
 
                 case implementationTypes.RXJS:
                     //Call to the template using RxJs Observables
-                    /*
-                    I could implement the subscribe here, but in order to keep the consistency between the
-                    implementations, implemented the subscribe in the helper file and used a call back
-                    for returning the response
-                    */
+                    //I could implement the subscribe here, but in order to keep the consistency between the
+                    //implementations, implemented the subscribe in the helper file and used a call back
+                    //for returning the response
+                    
                     templateHelper.getPageTemplateUsingRxJs(domains, (template, error) => {
                         if (error === null) {
                             res.end(template);
@@ -116,4 +115,15 @@ http.createServer((req, res) => {
     }
 }).listen(PORT, () => {
     console.log(`Server started using the port ${PORT}`);
+});*/
+
+/*
+This is second approach with a different project structure
+*/
+
+app.get('/I/want/title/', titlecontroller.getTitles);
+app.set('view engine', 'ejs');
+app.listen(PORT, () => {
+    console.log(`Server started using the port ${PORT}`);
 });
+

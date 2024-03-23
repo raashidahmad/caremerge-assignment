@@ -68,4 +68,28 @@ function createTemplate(domains) {
             </html>`;
 }
 
-module.exports = { getPageTemplate, getPageTemplateUsingPromise, getPageTemplateUsingRxJs };
+function parseDomainsForView(domains) {
+    let domainsList = [];
+    if (typeof (domains) === 'string') {
+        if (domains.length === 0) {
+            domainsList.push("No domain name/s provided - NO RESPONSE");
+        } else {
+            if (!validations.validateDomainName(domains)) {
+                domainsList.push(`${domains} - NO RESPONSE`);
+            } else {
+                domainsList.push(domains);
+            }
+        }
+    } else if (Array.isArray(domains)) {
+        for (let i = 0; i < domains.length; i++) {
+             if (!validations.validateDomainName(domains[i])) {
+                domainsList.push(`${domains[i]} - NO RESPONSE`);
+             } else {
+                domainsList.push(domains[i]);
+             }
+        }
+    }
+    return domainsList;
+}
+
+module.exports = { getPageTemplate, getPageTemplateUsingPromise, getPageTemplateUsingRxJs, parseDomainsForView };
