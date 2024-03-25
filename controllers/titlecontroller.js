@@ -9,7 +9,7 @@ exports.getTitles = (req, res) => {
         domains = queryData['address'];
     }
 
-    templateHelper.parseTitles(domains, async (titles, error) => {
+    templateHelper.parseTitlesUsingFetch(domains, async (titles, error) => {
         if (error === null) {
             console.log(titles);
             res.render('title', { titles, error });

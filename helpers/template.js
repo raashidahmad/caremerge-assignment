@@ -2,9 +2,13 @@ let validations = require('./validators');
 const { from } = require('rxjs');
 const cheerio = require('cheerio');
 const axios = require('axios');
+const async = require('async');
+
 
 const NO_RESPONSE = 'NO RESPONSE';
-function getPageTemplate(domains, callback) {
+const defaultHtml = `<title>${NO_RESPONSE}</title>`;
+
+/*function getPageTemplate(domains, callback) {
     try {
         let template = createTemplate(domains);
         //Using timeout only to simulate the db call or a file read
@@ -98,20 +102,20 @@ function parseDomainsForView(domains, callback) {
         }
         callback(domainsList, null);
     } 
-}
+}*/
 
-async function parseTitles(domains, callback) {
+async function parseTitlesUsingAxios(domains, callback) {
     try {
-        let domainsList = typeof(domains) === 'string' ? [domains] : domains;
+        let domainsList = typeof (domains) === 'string' ? [domains] : domains;
         let titles = [];
         let index = 0;
-        let defaultHtml = `<title>${NO_RESPONSE}</title>`;
-        for(let i = 0; i < domainsList.length; i++) {
+
+        for (let i = 0; i < domainsList.length; i++) {
             index = i;
             await axios.get(domainsList[i]).then((result) => {
                 const $ = cheerio.load(result && result.data || defaultHtml);
                 let pageTitle = $('title').text();
-                
+
                 if (pageTitle) {
                     titles.push(`${domainsList[i]} - ${pageTitle}`);
                 } else {
@@ -119,20 +123,57 @@ async function parseTitles(domains, callback) {
                 }
 
                 if (i === domainsList.length - 1) {
-                    console.log(`All are executed ${i}`);
                     callback(titles);
                 }
             }).catch(err => {
-                titles.push(`${domainsList[index]} - ${NO_RESPONSE}`);
-                if (index === domainsList.length - 1) {
+                titles.push(`${domainsList[titles.length - 1]} - ${NO_RESPONSE}`);
+                if (titles.length === domainsList.length) {
                     callback(titles);
                 }
-                console.log('Error: ', err.message);
             });
         }
-      } catch (error) {
+    } catch (error) {
+        titles.push(`${domainsList[titles.length]} - ${NO_RESPONSE}`);
+        if (titles.length === domainsList.length) {
+            callback(titles);
+        }
         console.error('Error fetching data:', error);
-      }
+    }
 }
 
-module.exports = { getPageTemplate, getPageTemplateUsingPromise, getPageTemplateUsingRxJs, parseDomainsForView, parseTitles };
+async function parseTitlesUsingFetch(domains, callback) {
+    let titles = [];
+
+    try {
+        let domainsList = typeof (domains) === 'string' ? [domains] : domains;
+        for (let i = 0; i < domainsList.length; i++) {
+
+            await fetch(domainsList[i])
+                .then((response) => response.text())
+                .then((html) => {
+                    const $ = cheerio.load(html || defaultHtml);
+                    let pageTitle = $('title').text();
+
+                    if (pageTitle) {
+                        titles.push(`${domainsList[i]} - ${pageTitle}`);
+                    } else {
+                        titles.push(`${domainsList[i]} - ${NO_RESPONSE}`);
+                    }
+
+                    if (i === domainsList.length - 1) {
+                        console.log(`All are executed ${i}`);
+                        callback(titles);
+                    }
+                })
+                .catch((error) => {
+                    titles.push(`${domainsList[titles.length]} - ${NO_RESPONSE}`);
+                    if (titles.length === domainsList.length) {
+                        callback(titles);
+                    }
+                });
+        }
+    } catch (error) {
+        console.log(`Unable to connect with the server ${error.message}`);
+    }
+}
+module.exports = { parseTitlesUsingAxios, parseTitlesUsingFetch };
