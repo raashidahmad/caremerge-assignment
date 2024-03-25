@@ -9,10 +9,11 @@ exports.getTitles = (req, res) => {
         domains = queryData['address'];
     }
 
-    templateHelper.parseDomainsForView(domains, async (domainsList, error) => {
+    templateHelper.parseTitles(domains, async (titles, error) => {
         if (error === null) {
-            res.render('title', { domainsList, error });
+            console.log(titles);
+            res.render('title', { titles, error });
         } else {
-            res.render('title', { domainsList, error });
+            res.render('title', { titles, error });
         }});
 };

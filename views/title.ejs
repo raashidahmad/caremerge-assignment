@@ -3,8 +3,8 @@
 <body>
     <h1> Following are the titles of given websites: </h1>
     <ul>
-        <% domainsList.forEach(domain => { %>
-            <li><%= domain %></li>
+        <% titles.forEach(title => { %>
+            <li><%= title %></li>
         <% }) %>
     </ul>
     <% if (error && error.message) { %>

@@ -29,7 +29,7 @@ const PORT = process.env.PORT || 3000;
 First the basic approach using the app as a main file only
 Started my learning with this approach
 */
-http.createServer((req, res) => {
+/*http.createServer((req, res) => {
     try {
         const queryData = url.parse(req.url, true).query;
         const pathname = url.parse(req.url, true).pathname;
@@ -123,7 +123,7 @@ http.createServer((req, res) => {
     }
 }).listen(PORT, () => {
     console.log(`Server started using the port ${PORT}`);
-});
+});*/
 
 /*
 End of the first and basic approach.
@@ -137,9 +137,9 @@ different controllers as it is in MVC and render the views using
 the html files
 */
 
-/*app.get('/I/want/title/', titlecontroller.getTitles);
+app.get('/I/want/title/', titlecontroller.getTitles);
 app.set('view engine', 'ejs');
 app.listen(PORT, () => {
     console.log(`Server started using the port ${PORT}`);
-});*/
+});
 
