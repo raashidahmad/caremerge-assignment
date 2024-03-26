@@ -13,17 +13,16 @@ exports.getTitles = (req, res) => {
     const implementationTypes = implementations.asyncImplementations;
 
     //Please comment, and uncomment to see the each implementation
-    //let currentType = implementationTypes.RXJS;
+    let currentType = implementationTypes.RXJS;
     //let currentType = implementationTypes.RSVP;
     //let currentType = implementationTypes.FETCH;
-    let currentType = implementationTypes.AXIOS;
+    //let currentType = implementationTypes.AXIOS;
 
     switch (currentType) {
 
         case implementationTypes.AXIOS:
             templateHelper.parseTitlesUsingAxios(domains, async (titles, error) => {
                 if (error === null) {
-                    console.log(titles);
                     res.render('title', { titles, error });
                 } else {
                     res.render('title', { titles, error });
@@ -34,7 +33,6 @@ exports.getTitles = (req, res) => {
         case implementationTypes.FETCH:
             templateHelper.parseTitlesUsingFetch(domains, async (titles, error) => {
                 if (error === null) {
-                    console.log(titles);
                     res.render('title', { titles, error });
                 } else {
                     res.render('title', { titles, error });
@@ -45,7 +43,6 @@ exports.getTitles = (req, res) => {
         case implementationTypes.RSVP:
             templateHelper.parseTitlesUsingRSVP(domains, async (titles, error) => {
                 if (error === null) {
-                    console.log(titles);
                     res.render('title', { titles, error });
                 } else {
                     res.render('title', { titles, error });
@@ -56,7 +53,6 @@ exports.getTitles = (req, res) => {
         case implementationTypes.RXJS:
             templateHelper.parseTitlesUsingRxJs(domains, async (titles, error) => {
                 if (error === null) {
-                    console.log(titles);
                     res.render('title', { titles, error });
                 } else {
                     res.render('title', { titles, error });

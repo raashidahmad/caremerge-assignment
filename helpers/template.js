@@ -99,7 +99,7 @@ async function parseTitlesUsingRSVP(domains, callback) {
                         titles.push(`${domainsList[i]} - ${NO_RESPONSE}`);
                     }
 
-                    if (i === domainsList.length - 1) {
+                    if (titles.length === domainsList.length) {
                         callback(titles);
                     }
             }).catch((error) => {
@@ -136,7 +136,7 @@ function parseTitlesUsingRxJs(domains, callback) {
                         titles.push(`${domainsList[i]} - ${NO_RESPONSE}`);
                     }
 
-                    if (i === domainsList.length - 1) {
+                    if (titles.length === domainsList.length) {
                         callback(titles);
                     }
                 },
@@ -163,7 +163,6 @@ function getAPromise(url) {
             resolve(response.data);
         })
             .catch(error => {
-                console.log(error);
                 reject(error);
             });
     });
