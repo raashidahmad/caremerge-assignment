@@ -1,7 +1,7 @@
 const asyncImplementations = Object.freeze({ 
-    SIMPLE_CALLBACK: 1, 
-    ASYNC_LIB: 2, 
-    PROMISES: 3, 
+    AXIOS: 1, 
+    FETCH: 2, 
+    RSVP: 3, 
     RXJS: 4
 }); 
 
