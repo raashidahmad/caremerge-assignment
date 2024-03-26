@@ -13,10 +13,10 @@ exports.getTitles = (req, res) => {
     const implementationTypes = implementations.asyncImplementations;
 
     //Please comment, and uncomment to see the each implementation
-    let currentType = implementationTypes.RXJS;
+    //let currentType = implementationTypes.RXJS;
     //let currentType = implementationTypes.RSVP;
     //let currentType = implementationTypes.FETCH;
-    //let currentType = implementationTypes.AXIOS;
+    let currentType = implementationTypes.AXIOS;
 
     switch (currentType) {
 

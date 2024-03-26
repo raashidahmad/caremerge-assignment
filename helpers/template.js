@@ -29,7 +29,7 @@ async function parseTitlesUsingAxios(domains, callback) {
                     callback(titles);
                 }
             }).catch(err => {
-                titles.push(`${domainsList[titles.length - 1]} - ${NO_RESPONSE}`);
+                titles.push(`${domainsList[titles.length]} - ${NO_RESPONSE}`);
                 if (titles.length === domainsList.length) {
                     callback(titles);
                 }
@@ -40,7 +40,7 @@ async function parseTitlesUsingAxios(domains, callback) {
         if (titles.length === domainsList.length) {
             callback(titles);
         }
-        console.error('Error fetching data:', error);
+        console.log(`Unable to connect with the server ${error.message}`);
     }
 }
 
@@ -75,6 +75,10 @@ async function parseTitlesUsingFetch(domains, callback) {
                 });
         }
     } catch (error) {
+        titles.push(`${domainsList[titles.length]} - ${NO_RESPONSE}`);
+        if (titles.length === domainsList.length) {
+            callback(titles);
+        }
         console.log(`Unable to connect with the server ${error.message}`);
     }
 }
@@ -106,6 +110,10 @@ async function parseTitlesUsingRSVP(domains, callback) {
             });
         }
     } catch (error) {
+        titles.push(`${domainsList[titles.length]} - ${NO_RESPONSE}`);
+        if (titles.length === domainsList.length) {
+            callback(titles);
+        }
         console.log(`Unable to connect with the server ${error.message}`);
     }
 }
@@ -141,6 +149,10 @@ function parseTitlesUsingRxJs(domains, callback) {
             });
         }
     } catch (error) {
+        titles.push(`${domainsList[titles.length]} - ${NO_RESPONSE}`);
+        if (titles.length === domainsList.length) {
+            callback(titles);
+        }
         console.log(`Unable to connect with the server ${error.message}`);
     }
 }
