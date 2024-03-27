@@ -18,9 +18,9 @@ async function parseTitlesUsingAxios(domain, callback) {
                     let pageTitle = $('title').text();
     
                     if (pageTitle) {
-                        callback(pageTitle, null);
+                        callback(`${domain} - ${pageTitle}`, null);
                     } else {
-                        callback(NO_RESPONSE, null);
+                        callback(`${domain} - ${NO_RESPONSE}`, null);
                     }
                 }).catch(err => {
                     callback(`${domain} - ${NO_RESPONSE}`);
@@ -44,9 +44,9 @@ async function parseTitlesUsingFetch(domain, callback) {
                     let pageTitle = $('title').text();
 
                     if (pageTitle) {
-                        callback(pageTitle, null);
+                        callback(`${domain} - ${pageTitle}`, null);
                     } else {
-                        callback(NO_RESPONSE, null);
+                        callback(`${domain} - ${NO_RESPONSE}`, null);
                     }
                 })
                 .catch((error) => {
@@ -70,9 +70,9 @@ async function parseTitlesUsingRSVP(domain, callback) {
                     let pageTitle = $('title').text();
 
                     if (pageTitle) {
-                        callback(pageTitle, null);
+                        callback(`${domain} - ${pageTitle}`, null);
                     } else {
-                        callback(NO_RESPONSE, null);
+                        callback(`${domain} - ${NO_RESPONSE}`, null);
                     }
             }).catch((error) => {
                 callback(`${domain} - ${NO_RESPONSE}`);
@@ -96,9 +96,9 @@ function parseTitlesUsingRxJs(domain, callback) {
                     let pageTitle = $('title').text();
 
                     if (pageTitle) {
-                        callback(pageTitle, null);
+                        callback(`${domain} - ${pageTitle}`, null);
                     } else {
-                        callback(NO_RESPONSE, null);
+                        callback(`${domain} - ${NO_RESPONSE}`, null);
                     }
                 },
                 error: error => {
