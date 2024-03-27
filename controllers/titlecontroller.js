@@ -13,51 +13,73 @@ exports.getTitles = (req, res) => {
     const implementationTypes = implementations.asyncImplementations;
 
     //Please comment, and uncomment to see the each implementation
-    let currentType = implementationTypes.RXJS;
+    //let currentType = implementationTypes.RXJS;
     //let currentType = implementationTypes.RSVP;
     //let currentType = implementationTypes.FETCH;
-    //let currentType = implementationTypes.AXIOS;
+    let currentType = implementationTypes.AXIOS;
+
+    let titles = [];
+    let domainsList = typeof (domains) === 'string' ? [domains] : domains;
+    let errorMessage = '';
 
     switch (currentType) {
 
         case implementationTypes.AXIOS:
-            templateHelper.parseTitlesUsingAxios(domains, async (titles, error) => {
-                if (error === null) {
-                    res.render('title', { titles, error });
-                } else {
-                    res.render('title', { titles, error });
-                }
-            });
+            for (let d = 0; d < domainsList.length; d++) {
+                templateHelper.parseTitlesUsingAxios(domainsList[d], async (fetchedTitle, error) => {
+                    titles.push(fetchedTitle);
+                    if (error && error.message) {
+                        errorMessage = error.message;
+                    }
+                    if (titles.length === domainsList.length) {
+                        res.render('title', { titles, errorMessage });
+                    }
+                });
+            }
             break;
 
         case implementationTypes.FETCH:
-            templateHelper.parseTitlesUsingFetch(domains, async (titles, error) => {
-                if (error === null) {
-                    res.render('title', { titles, error });
-                } else {
-                    res.render('title', { titles, error });
-                }
-            });
+            for (let d = 0; d < domainsList.length; d++) {
+                templateHelper.parseTitlesUsingFetch(domainsList[d], async (fetchedTitle, error) => {
+                    titles.push(fetchedTitle);
+                    if (error && error.message) {
+                        errorMessage = error.message;
+                    }
+                    if (titles.length === domainsList.length) {
+                        res.render('title', { titles, errorMessage });
+                    }
+                });
+            }
             break;
 
         case implementationTypes.RSVP:
-            templateHelper.parseTitlesUsingRSVP(domains, async (titles, error) => {
-                if (error === null) {
-                    res.render('title', { titles, error });
-                } else {
-                    res.render('title', { titles, error });
-                }
-            });
+            for (let d = 0; d < domainsList.length; d++) {
+                templateHelper.parseTitlesUsingRSVP(domainsList[d], async (fetchedTitle, error) => {
+                    titles.push(fetchedTitle);
+                    if (error && error.message) {
+                        errorMessage = error.message;
+                    }
+
+                    if (titles.length === domainsList.length) {
+                        res.render('title', { titles, errorMessage });
+                    }
+                });
+            }
             break;
 
         case implementationTypes.RXJS:
-            templateHelper.parseTitlesUsingRxJs(domains, async (titles, error) => {
-                if (error === null) {
-                    res.render('title', { titles, error });
-                } else {
-                    res.render('title', { titles, error });
-                }
-            });
+            for (let d = 0; d < domainsList.length; d++) {
+                templateHelper.parseTitlesUsingRxJs(domainsList[d], async (fetchedTitle, error) => {
+                    titles.push(fetchedTitle);
+                    if (error && error.message) {
+                        errorMessage = error.message;
+                    }
+
+                    if (titles.length === domainsList.length) {
+                        res.render('title', { titles, errorMessage });
+                    }
+                });
+            }
             break;
     }
 

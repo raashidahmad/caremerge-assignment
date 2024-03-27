@@ -8,151 +8,106 @@ const { Observable } = require('rxjs');
 const NO_RESPONSE = 'NO RESPONSE';
 const defaultHtml = `<title>${NO_RESPONSE}</title>`;
 
-async function parseTitlesUsingAxios(domains, callback) {
+async function parseTitlesUsingAxios(domain, callback) {
     try {
-        let domainsList = typeof (domains) === 'string' ? [domains] : domains;
-        let titles = [];
-
-        for (let i = 0; i < domainsList.length; i++) {
-            index = i;
-            await axios.get(domainsList[i]).then((result) => {
-                const $ = cheerio.load(result && result.data || defaultHtml);
-                let pageTitle = $('title').text();
-
-                if (pageTitle) {
-                    titles.push(`${domainsList[i]} - ${pageTitle}`);
-                } else {
-                    titles.push(`${domainsList[i]} - ${NO_RESPONSE}`);
-                }
-
-                if (i === domainsList.length - 1) {
-                    callback(titles);
-                }
-            }).catch(err => {
-                titles.push(`${domainsList[titles.length]} - ${NO_RESPONSE}`);
-                if (titles.length === domainsList.length) {
-                    callback(titles);
-                }
-            });
-        }
+            if (!validations.validateDomainName(domain)) {
+                callback(`${domain} - ${NO_RESPONSE}`);
+            } else {
+                await axios.get(domain).then((result) => {
+                    const $ = cheerio.load(result && result.data || defaultHtml);
+                    let pageTitle = $('title').text();
+    
+                    if (pageTitle) {
+                        callback(pageTitle, null);
+                    } else {
+                        callback(NO_RESPONSE, null);
+                    }
+                }).catch(err => {
+                    callback(`${domain} - ${NO_RESPONSE}`);
+                });
+            }
     } catch (error) {
-        titles.push(`${domainsList[titles.length]} - ${NO_RESPONSE}`);
-        if (titles.length === domainsList.length) {
-            callback(titles);
-        }
+        callback(`${domain} - ${NO_RESPONSE}`, error.message);
         console.log(`Unable to connect with the server ${error.message}`);
     }
 }
 
-async function parseTitlesUsingFetch(domains, callback) {
-    let titles = [];
-
+async function parseTitlesUsingFetch(domain, callback) {
     try {
-        let domainsList = typeof (domains) === 'string' ? [domains] : domains;
-        for (let i = 0; i < domainsList.length; i++) {
-
-            await fetch(domainsList[i])
+        if (!validations.validateDomainName(domain)) {
+            callback(`${domain} - ${NO_RESPONSE}`);
+        } else {
+            await fetch(domain)
                 .then((response) => response.text())
                 .then((html) => {
                     const $ = cheerio.load(html || defaultHtml);
                     let pageTitle = $('title').text();
 
                     if (pageTitle) {
-                        titles.push(`${domainsList[i]} - ${pageTitle}`);
+                        callback(pageTitle, null);
                     } else {
-                        titles.push(`${domainsList[i]} - ${NO_RESPONSE}`);
-                    }
-
-                    if (i === domainsList.length - 1) {
-                        callback(titles);
+                        callback(NO_RESPONSE, null);
                     }
                 })
                 .catch((error) => {
-                    titles.push(`${domainsList[titles.length]} - ${NO_RESPONSE}`);
-                    if (titles.length === domainsList.length) {
-                        callback(titles);
-                    }
+                    callback(`${domain} - ${NO_RESPONSE}`);
                 });
         }
     } catch (error) {
-        titles.push(`${domainsList[titles.length]} - ${NO_RESPONSE}`);
-        if (titles.length === domainsList.length) {
-            callback(titles);
-        }
+        callback(`${domain} - ${NO_RESPONSE}`, error.message);
         console.log(`Unable to connect with the server ${error.message}`);
     }
 }
 
-async function parseTitlesUsingRSVP(domains, callback) {
-    let titles = [];
+async function parseTitlesUsingRSVP(domain, callback) {
     try {
-        let domainsList = typeof (domains) === 'string' ? [domains] : domains;
-        for (let i = 0; i < domainsList.length; i++) {
-            let result = getAPromise(domainsList[i]);
+        if (!validations.validateDomainName(domain)) {
+            callback(`${domain} - ${NO_RESPONSE}`);
+        } else {
+            let result = getAPromise(domain);
             result.then((html) => {
                 const $ = cheerio.load(html || defaultHtml);
                     let pageTitle = $('title').text();
 
                     if (pageTitle) {
-                        titles.push(`${domainsList[i]} - ${pageTitle}`);
+                        callback(pageTitle, null);
                     } else {
-                        titles.push(`${domainsList[i]} - ${NO_RESPONSE}`);
-                    }
-
-                    if (titles.length === domainsList.length) {
-                        callback(titles);
+                        callback(NO_RESPONSE, null);
                     }
             }).catch((error) => {
-                titles.push(`${domainsList[titles.length]} - ${NO_RESPONSE}`);
-                    if (titles.length === domainsList.length) {
-                        callback(titles);
-                    }
+                callback(`${domain} - ${NO_RESPONSE}`);
             });
         }
     } catch (error) {
-        titles.push(`${domainsList[titles.length]} - ${NO_RESPONSE}`);
-        if (titles.length === domainsList.length) {
-            callback(titles);
-        }
+        callback(`${domain} - ${NO_RESPONSE}`, error.message);
         console.log(`Unable to connect with the server ${error.message}`);
     }
 }
 
-function parseTitlesUsingRxJs(domains, callback) {
-    let titles = [];
+function parseTitlesUsingRxJs(domain, callback) {
     try {
-        let domainsList = typeof (domains) === 'string' ? [domains] : domains;
-        for (let i = 0; i < domainsList.length; i++) {
-            let observable = getAnObervable(domainsList[i]);
-
+        if (!validations.validateDomainName(domain)) {
+            callback(`${domain} - ${NO_RESPONSE}`);
+        } else {
+            let observable = getAnObervable(domain);
             observable.subscribe({
                 next: html => {
                     const $ = cheerio.load(html || defaultHtml);
                     let pageTitle = $('title').text();
 
                     if (pageTitle) {
-                        titles.push(`${domainsList[i]} - ${pageTitle}`);
+                        callback(pageTitle, null);
                     } else {
-                        titles.push(`${domainsList[i]} - ${NO_RESPONSE}`);
-                    }
-
-                    if (titles.length === domainsList.length) {
-                        callback(titles);
+                        callback(NO_RESPONSE, null);
                     }
                 },
                 error: error => {
-                    titles.push(`${domainsList[titles.length]} - ${NO_RESPONSE}`);
-                    if (titles.length === domainsList.length) {
-                        callback(titles);
-                    }
+                    callback(`${domain} - ${NO_RESPONSE}`);
                 }
             });
         }
     } catch (error) {
-        titles.push(`${domainsList[titles.length]} - ${NO_RESPONSE}`);
-        if (titles.length === domainsList.length) {
-            callback(titles);
-        }
+        callback(`${domain} - ${NO_RESPONSE}`, error.message);
         console.log(`Unable to connect with the server ${error.message}`);
     }
 }
