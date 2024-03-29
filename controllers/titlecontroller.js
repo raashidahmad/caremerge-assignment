@@ -1,6 +1,7 @@
 const url = require('url');
 const templateHelper = require('../helpers/template');
 const implementations = require('../helpers/constants');
+const async = require('async');
 
 exports.getTitles = (req, res) => {
     const queryData = url.parse(req.url, true).query;
@@ -16,7 +17,8 @@ exports.getTitles = (req, res) => {
     //let currentType = implementationTypes.RXJS;
     //let currentType = implementationTypes.RSVP;
     //let currentType = implementationTypes.FETCH;
-    let currentType = implementationTypes.AXIOS;
+    //let currentType = implementationTypes.AXIOS;
+    let currentType = implementationTypes.ASYNC_LIB;
 
     let titles = [];
     let domainsList = typeof (domains) === 'string' ? [domains] : domains;
@@ -80,6 +82,15 @@ exports.getTitles = (req, res) => {
                     }
                 });
             }
+            break;
+
+        case implementationTypes.ASYNC_LIB:
+            async.mapLimit(domainsList, domainsList.length, templateHelper.parseTitlesForAsyncLib, (err, titles) => {
+                if (err) {
+                    console.log(`Error occurred: ${err.message}`);
+                }
+                res.render('title', { titles, errorMessage });
+            });
             break;
     }
 
