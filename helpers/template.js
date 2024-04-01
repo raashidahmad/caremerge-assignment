@@ -2,7 +2,7 @@ let validations = require('./validators');
 const cheerio = require('cheerio');
 const axios = require('axios');
 const RSVP = require('rsvp');
-const { Observable, from, throwError, pipe } = require('rxjs');
+const { Observable, from, of, throwError, pipe, forkJoin, isObservable  } = require('rxjs');
 const { mergeMap, catchError } = require('rxjs/operators');
 
 
@@ -86,31 +86,89 @@ async function parseTitlesUsingRSVP(domain) {
     }
 }
 
-function parseTitlesUsingRxJs(domain, callback) {
+function parseTitlesUsingRxJs(domainsList, callback) {
     try {
-        if (!validations.validateDomainName(domain)) {
-            callback(`${domain} - ${NO_RESPONSE}`);
+        let results = [];
+
+        const requestAsObservable = url => axios.get(url).catch(error => of({ url: url, data: NO_RESPONSE , error: error }));
+        const observables = domainsList.map(requestAsObservable);
+        forkJoin(...observables).subscribe(
+            responses => {
+                responses.forEach((response, index) => {
+                    if (isObservable(response)) {
+                        response.subscribe(responseInfo => {
+                            if (responseInfo.url && responseInfo.data) {
+                                results.push(`${responseInfo.url} - ${NO_RESPONSE}`);
+                            }
+                        })
+                    } else {
+                        if (response && response.data) {
+                            const $ = cheerio.load(response.data || defaultHtml);
+                            let pageTitle = $('title').text();
+        
+                            if (pageTitle) {
+                                results.push(`${domainsList[index]} - ${pageTitle}`);
+                            } else {
+                                results.push(`${domainsList[index]} - ${NO_RESPONSE}`);
+                            }
+                        } else {
+                            console.log(response);
+                        }
+                    }
+                });
+                callback(results);
+            },
+            error => {
+                results.push(`${error.url} - ${NO_RESPONSE}`);
+                console.error('Error fetching data:', error);
+            }
+        );
+        /*forkJoin(requests).subscribe({
+            next: (responses) => {
+                for(let r = 0; r < responses.length; r++) {
+                    let response = responses[r];
+                    if (response && response.data) {
+                        const $ = cheerio.load(response && response.data || defaultHtml);
+                        let pageTitle = $('title').text();
+    
+                        if (pageTitle) {
+                            results.push(`${response.url} - ${pageTitle}`);
+                        } else {
+                            results.push(`${response.url} - ${NO_RESPONSE}`);
+                        }
+                    } else if (response.error) {
+                        results.push(`${response.url} - ${NO_RESPONSE}`);
+                    }
+                }
+                callback(results);
+            },
+            error: (error) => {
+                console.log(`An error occurred ${error}`);
+            }
+        });*/
+        /*if (!validations.validateDomainName(domain)) {
+            return (`${domain} - ${NO_RESPONSE}`);
         } else {
             let observable = getAnObervable(domain);
             observable.subscribe({
-                next: html => {
-                    const $ = cheerio.load(html || defaultHtml);
+                next: response => {
+                    const $ = cheerio.load(response && response.data || defaultHtml);
                     let pageTitle = $('title').text();
 
                     if (pageTitle) {
-                        callback(`${domain} - ${pageTitle}`, null);
+                        return (`${domain} - ${pageTitle}`);
                     } else {
-                        callback(`${domain} - ${NO_RESPONSE}`, null);
+                        return (`${domain} - ${NO_RESPONSE}`);
                     }
                 },
                 error: error => {
-                    callback(`${domain} - ${NO_RESPONSE}`);
+                    return (`${domain} - ${NO_RESPONSE}`);
                 }
-            });
-        }
+            }); 
+        }*/
     } catch (error) {
-        callback(`${domain} - ${NO_RESPONSE}`, error.message);
         console.log(`Unable to connect with the server ${error.message}`);
+        return(`${domain} - ${NO_RESPONSE}`);
     }
 }
 
@@ -185,6 +243,10 @@ function getAnObervable(url) {
                 subject.error({url: url, error: error});
             });
     });
+}
+
+function getResponseThroughObservables() {
+
 }
 
 /*function parseTitlesUsingAxiosAndRxJs(domainsList, callback) {

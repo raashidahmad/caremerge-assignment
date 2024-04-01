@@ -15,8 +15,8 @@ exports.getTitles = (req, res) => {
     const implementationTypes = implementations.asyncImplementations;
 
     //Please comment, and uncomment to see the each implementation
-    //let currentType = implementationTypes.RXJS;
-    let currentType = implementationTypes.RSVP;
+    let currentType = implementationTypes.RXJS;
+    //let currentType = implementationTypes.RSVP;
     //let currentType = implementationTypes.FETCH;
     //let currentType = implementationTypes.AXIOS;
     //let currentType = implementationTypes.ASYNC_LIB;
@@ -38,7 +38,8 @@ exports.getTitles = (req, res) => {
                     res.render('title', { titles, errorMessage });
                 },
                 error: error => {
-                    res.render('title', { titles, error });
+                    errorMessage = error;
+                    res.render('title', { titles, errorMessage });
                 }
             });
             break;
@@ -86,7 +87,10 @@ exports.getTitles = (req, res) => {
             break;
 
         case implementationTypes.RXJS:
-            for (let d = 0; d < domainsList.length; d++) {
+            templateHelper.parseTitlesUsingRxJs(domainsList, (titles) => {
+                res.render('title', { titles, errorMessage });
+            });
+            /*for (let d = 0; d < domainsList.length; d++) {
                 templateHelper.parseTitlesUsingRxJs(domainsList[d], async (fetchedTitle, error) => {
                     titles.push(fetchedTitle);
                     if (error && error.message) {
@@ -97,7 +101,7 @@ exports.getTitles = (req, res) => {
                         res.render('title', { titles, errorMessage });
                     }
                 });
-            }
+            }*/
             break;
 
         case implementationTypes.ASYNC_LIB:
