@@ -2,33 +2,35 @@ let validations = require('./validators');
 const cheerio = require('cheerio');
 const axios = require('axios');
 const RSVP = require('rsvp');
-const { Observable } = require('rxjs');
+const { Observable, from, throwError } = require('rxjs');
+const { mergeMap, catchError, pipe } = require('rxjs/operators');
 
 
 const NO_RESPONSE = 'NO RESPONSE';
 const defaultHtml = `<title>${NO_RESPONSE}</title>`;
 
-async function parseTitlesUsingAxios(domain, callback) {
+async function parseTitlesUsingAxios(domain) {
     try {
         if (!validations.validateDomainName(domain)) {
-            callback(`${domain} - ${NO_RESPONSE}`);
+            return (`${domain} - ${NO_RESPONSE}`);
         } else {
-            await axios.get(domain).then((result) => {
+            let result = await axios.get(domain).then((result) => {
                 const $ = cheerio.load(result && result.data || defaultHtml);
                 let pageTitle = $('title').text();
 
                 if (pageTitle) {
-                    callback(`${domain} - ${pageTitle}`, null);
+                    return (`${domain} - ${pageTitle}`);
                 } else {
-                    callback(`${domain} - ${NO_RESPONSE}`, null);
+                    return (`${domain} - ${NO_RESPONSE}`);
                 }
             }).catch(err => {
-                callback(`${domain} - ${NO_RESPONSE}`);
+                return (`${domain} - ${NO_RESPONSE}`);
             });
+            return result;
         }
     } catch (error) {
-        callback(`${domain} - ${NO_RESPONSE}`, error.message);
         console.log(`Unable to connect with the server ${error.message}`);
+        return (`${domain} - ${NO_RESPONSE}`, error.message);
     }
 }
 

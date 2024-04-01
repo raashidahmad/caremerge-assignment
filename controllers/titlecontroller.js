@@ -2,6 +2,7 @@ const url = require('url');
 const templateHelper = require('../helpers/template');
 const implementations = require('../helpers/constants');
 const async = require('async');
+const { combineLatest } = require('rxjs');
 
 exports.getTitles = (req, res) => {
     const queryData = url.parse(req.url, true).query;
@@ -24,7 +25,7 @@ exports.getTitles = (req, res) => {
     let domainsList = typeof (domains) === 'string' ? [domains] : domains;
     let errorMessage = '';
 
-    switch (currentType) {
+    /*switch (currentType) {
 
         case implementationTypes.AXIOS:
             for (let d = 0; d < domainsList.length; d++) {
@@ -92,6 +93,21 @@ exports.getTitles = (req, res) => {
                 res.render('title', { titles, errorMessage });
             });
             break;
+    }*/
+
+    let requests = [];
+    for (let d = 0; d < domainsList.length; d++) {
+        requests.push(templateHelper.parseTitlesUsingAxios(domainsList[d]));
     }
 
+    combineLatest(requests).subscribe({
+        next: titles => {
+            res.render('title', { titles, errorMessage });
+        },
+        error: error => {
+            //res.render('title', { titles, errorMessage });
+        }
+    }
+       
+    );
 };
