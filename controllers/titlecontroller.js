@@ -14,10 +14,10 @@ exports.getTitles = (req, res) => {
 
     const implementationTypes = implementations.asyncImplementations;
 
-    //Please comment, and uncomment to see the each implementation
-    let currentType = implementationTypes.RXJS;
+    //Please comment, and uncomment to see each implementation
+    //let currentType = implementationTypes.RXJS;
     //let currentType = implementationTypes.RSVP;
-    //let currentType = implementationTypes.FETCH;
+    let currentType = implementationTypes.FETCH;
     //let currentType = implementationTypes.AXIOS;
     //let currentType = implementationTypes.ASYNC_LIB;
 
@@ -46,7 +46,7 @@ exports.getTitles = (req, res) => {
 
         case implementationTypes.FETCH:
             for (let d = 0; d < domainsList.length; d++) {
-                templateHelper.parseTitlesUsingFetch(domainsList[d], async (fetchedTitle, error) => {
+                templateHelper.parseTitlesUsingFetch(domainsList[d], (fetchedTitle, error) => {
                     titles.push(fetchedTitle);
                     if (error && error.message) {
                         errorMessage = error.message;
@@ -72,66 +72,18 @@ exports.getTitles = (req, res) => {
                     res.render('title', { titles, errorMessage });
                 }
             });
-            /*for (let d = 0; d < domainsList.length; d++) {
-                templateHelper.parseTitlesUsingRSVP(domainsList[d], async (fetchedTitle, error) => {
-                    titles.push(fetchedTitle);
-                    if (error && error.message) {
-                        errorMessage = error.message;
-                    }
-
-                    if (titles.length === domainsList.length) {
-                        res.render('title', { titles, errorMessage });
-                    }
-                });
-            }*/
             break;
 
         case implementationTypes.RXJS:
             templateHelper.parseTitlesUsingRxJs(domainsList, (titles) => {
                 res.render('title', { titles, errorMessage });
             });
-            /*for (let d = 0; d < domainsList.length; d++) {
-                templateHelper.parseTitlesUsingRxJs(domainsList[d], async (fetchedTitle, error) => {
-                    titles.push(fetchedTitle);
-                    if (error && error.message) {
-                        errorMessage = error.message;
-                    }
-
-                    if (titles.length === domainsList.length) {
-                        res.render('title', { titles, errorMessage });
-                    }
-                });
-            }*/
             break;
 
         case implementationTypes.ASYNC_LIB:
             async.mapLimit(domainsList, domainsList.length, templateHelper.parseTitlesForAsyncLib, (err, titles) => {
-                if (err) {
-                    console.log(`Error occurred: ${err.message}`);
-                }
                 res.render('title', { titles, errorMessage });
             });
             break;
     }
-
-    /*for (let d = 0; d < domainsList.length; d++) {
-        requests.push(templateHelper.parseTitlesUsingAxios(domainsList[d]));
-    }
-
-    combineLatest(requests).subscribe({
-        next: titles => {
-            res.render('title', { titles, errorMessage });
-        },
-        error: error => {
-            //res.render('title', { titles, errorMessage });
-        }
-    }   
-    );*/
-
-    /*templateHelper.parseTitlesUsingAxiosAndRxJs(domainsList, (titles, err) => {
-        if (err) {
-            console.log(`Error occurred: ${err.message}`);
-        }
-        res.render('title', { titles, errorMessage });
-    });*/
 };
