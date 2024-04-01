@@ -2,8 +2,8 @@ let validations = require('./validators');
 const cheerio = require('cheerio');
 const axios = require('axios');
 const RSVP = require('rsvp');
-const { Observable, from, throwError } = require('rxjs');
-const { mergeMap, catchError, pipe } = require('rxjs/operators');
+const { Observable, from, throwError, pipe } = require('rxjs');
+const { mergeMap, catchError } = require('rxjs/operators');
 
 
 const NO_RESPONSE = 'NO RESPONSE';
@@ -46,7 +46,7 @@ async function parseTitlesUsingFetch(domain, callback) {
                     let pageTitle = $('title').text();
 
                     if (pageTitle) {
-                        callback(`${domain} - ${pageTitle}`, null);
+                        return(`${domain} - ${pageTitle}`, null);
                     } else {
                         callback(`${domain} - ${NO_RESPONSE}`, null);
                     }
@@ -61,28 +61,28 @@ async function parseTitlesUsingFetch(domain, callback) {
     }
 }
 
-async function parseTitlesUsingRSVP(domain, callback) {
+async function parseTitlesUsingRSVP(domain) {
     try {
         if (!validations.validateDomainName(domain)) {
-            callback(`${domain} - ${NO_RESPONSE}`);
+            return(`${domain} - ${NO_RESPONSE}`);
         } else {
-            let result = getAPromise(domain);
-            result.then((html) => {
-                const $ = cheerio.load(html || defaultHtml);
+            let response = await getAPromise(domain);
+            if (response && response.data) {
+                const $ = cheerio.load(response.data || defaultHtml);
                 let pageTitle = $('title').text();
 
                 if (pageTitle) {
-                    callback(`${domain} - ${pageTitle}`, null);
+                    return(`${domain} - ${pageTitle}`);
                 } else {
-                    callback(`${domain} - ${NO_RESPONSE}`, null);
+                    return(`${domain} - ${NO_RESPONSE}`);
                 }
-            }).catch((error) => {
-                callback(`${domain} - ${NO_RESPONSE}`);
-            });
+            } else if(response && response.error) {
+                return(`${domain} - ${NO_RESPONSE}`);
+            };
         }
     } catch (error) {
-        callback(`${domain} - ${NO_RESPONSE}`, error.message);
         console.log(`Unable to connect with the server ${error.message}`);
+        return(`${domain} - ${NO_RESPONSE}`);
     }
 }
 
@@ -140,13 +140,36 @@ async function parseTitlesForAsyncLib(domain) {
     }
 }
 
+/*async function getAPromise(url) {
+    return new RSVP.Promise(async (resolve, reject) => {
+        await axios.get(url).then((response) => {
+            resolve({
+                url: url,
+                data: response.data
+            });
+        })
+            .catch(error => {
+                reject({
+                    url: url,
+                    error: error
+                });
+            });
+    });
+}*/
+
 function getAPromise(url) {
     return new RSVP.Promise(async (resolve, reject) => {
         await axios.get(url).then((response) => {
-            resolve(response.data);
+            resolve({
+                url: url,
+                data: response.data
+            });
         })
             .catch(error => {
-                reject(error);
+                reject({
+                    url: url,
+                    error: error
+                });
             });
     });
 }
@@ -155,13 +178,66 @@ function getAnObervable(url) {
     return new Observable((subject) => {
         axios.get(url)
             .then((response) => {
-                subject.next(response.data);
+                subject.next({ url: url, data: response.data});
                 subject.complete();
             })
             .catch((error) => {
-                subject.error(error);
+                subject.error({url: url, error: error});
             });
     });
 }
+
+/*function parseTitlesUsingAxiosAndRxJs(domainsList, callback) {
+    let results = [];
+    const requests = from(domainsList);
+
+    requests.pipe(
+        mergeMap((url) => {
+            return from(makeRequest(url));
+        })
+    ).subscribe((result) => {
+        const $ = cheerio.load(result && result.data || defaultHtml);
+        let pageTitle = $('title').text();
+
+        if (pageTitle) {
+            results.push(`${result.url} ${pageTitle}`);
+        } else {
+            results.push(`${result.url} ${NO_RESPONSE}`);
+        }
+    },
+    (error) => {
+      console.error(`Error occurred: ${error.message}`);
+      results.push(`${error.url} - ${NO_RESPONSE}`);
+    },
+    () => {
+      console.log('All requests completed.');
+      callback(results, null);
+    }
+  );
+}
+
+async function makeRequest(url) {
+    /*return axios.get(url).catch((e) => {
+        let err = {
+            url: url,
+            error: e
+        };
+        return throwError(err);
+    });
+
+    let response  = await fetch(url);
+    if (response.ok) {
+        return {
+            url: url,
+            data: response.text()
+        };
+    } else {
+        let err = {
+            url: url,
+            error: 'Error occurred'
+        }
+        return throwError(err);
+    }
+  };*/
 
 module.exports = { parseTitlesUsingAxios, parseTitlesUsingFetch, parseTitlesUsingRSVP, parseTitlesUsingRxJs, parseTitlesForAsyncLib };
