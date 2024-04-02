@@ -29,7 +29,7 @@ async function parseTitlesUsingAxios(domain) {
         }
     } catch (error) {
         console.log(`Unable to connect with the server ${error.message}`);
-        return (`${domain} - ${NO_RESPONSE}`, error.message);
+        return (`${domain} - ${NO_RESPONSE}`);
     }
 }
 
