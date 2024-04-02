@@ -3,7 +3,6 @@ const cheerio = require('cheerio');
 const axios = require('axios');
 const RSVP = require('rsvp');
 const { of, forkJoin, isObservable  } = require('rxjs');
-//const { mergeMap, catchError } = require('rxjs/operators');
 
 
 const NO_RESPONSE = 'NO RESPONSE';
@@ -81,8 +80,10 @@ async function parseTitlesUsingRSVP(domain) {
             };
         }
     } catch (error) {
-        console.log(`Unable to connect with the server ${error.message}`);
-        return(`${domain} - ${NO_RESPONSE}`);
+        console.log(`Unable to connect with the server ${error && error.url}`);
+        if (error && error.url) {
+            return(`${error.url} - ${NO_RESPONSE}`);
+        }
     }
 }
 
@@ -122,8 +123,10 @@ function parseTitlesUsingRxJs(domainsList, callback) {
             }
         );
     } catch (error) {
-        console.log(`Unable to connect with the server ${error.message}`);
-        return(`${domain} - ${NO_RESPONSE}`);
+        console.log(`Unable to connect with the server ${error && error.url}`);
+        if (error && error.url) {
+            return(`${domain} - ${NO_RESPONSE}`);
+        }
     }
 }
 
