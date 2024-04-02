@@ -124,9 +124,6 @@ function parseTitlesUsingRxJs(domainsList, callback) {
         );
     } catch (error) {
         console.log(`Unable to connect with the server ${error && error.url}`);
-        if (error && error.url) {
-            return(`${domain} - ${NO_RESPONSE}`);
-        }
     }
 }
 
@@ -174,7 +171,7 @@ function getAPromise(url) {
 }
 
 function requestAsObservable(url) {
-    return axios.get(url).catch(error => of({ url: url, data: NO_RESPONSE , error: error }));  
+    return axios.get(url).catch(error => of({ url: url, data: NO_RESPONSE, error: error }));  
 } 
 
 module.exports = { parseTitlesUsingAxios, parseTitlesUsingFetch, parseTitlesUsingRSVP, parseTitlesUsingRxJs, parseTitlesForAsyncLib };
