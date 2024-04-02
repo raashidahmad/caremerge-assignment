@@ -111,7 +111,7 @@ function parseTitlesUsingRxJs(domainsList, callback) {
                                 results.push(`${domainsList[index]} - ${NO_RESPONSE}`);
                             }
                         } else {
-                            console.log(response);
+                            results.push(`${domainsList[index]} - ${NO_RESPONSE}`);
                         }
                     }
                 });
